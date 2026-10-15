@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Doctor Appointment - DocCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            
+            <!-- Card Wrapper -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                
+                <!-- Card Header Banner -->
+                <div class="p-4 text-white" style="background: linear-gradient(135deg, #0d9488, #0284c7);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="badge bg-white text-dark rounded-pill px-3 py-1 mb-2 fw-semibold small">
+                                <i class="bi bi-calendar-check text-success me-1"></i> Easy Booking
+                            </span>
+                            <h3 class="fw-bold mb-1">Book an Appointment</h3>
+                            <p class="text-white-50 mb-0 small">Fill in the details below to secure your consultation slot.</p>
+                        </div>
+                        <div class="d-none d-sm-block fs-1 opacity-75">
+                            <i class="bi bi-hospital"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Body -->
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form method="POST" action="">
+                        {% csrf_token %}
+
+                        <!-- Section 1: Patient Information -->
+                        <h6 class="text-uppercase fw-bold text-muted mb-3 small tracking-wide">
+                            <i class="bi bi-person-bounding-box text-teal me-1" style="color: #0d9488;"></i> 1. Patient Details
+                        </h6>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Patient Name -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                                    <input type="text" name="name" class="form-control border-start-0" placeholder="e.g. Rahul Sharma" required>
+                                </div>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-telephone"></i></span>
+                                    <input type="tel" name="phone" class="form-control border-start-0" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="10-digit mobile number" required>
+                                </div>
+                            </div>
+
+                            <!-- City -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">City</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-geo-alt"></i></span>
+                                    <input type="text" name="city" class="form-control border-start-0" placeholder="e.g. Bhopal" required>
+                                </div>
+                            </div>
+
+                            <!-- Age -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Age</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-calendar3"></i></span>
+                                    <input type="number" name="age" class="form-control border-start-0" min="1" max="110" placeholder="Age" value="22" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 text-muted opacity-25">
+
+                        <!-- Section 2: Doctor & Schedule Selection -->
+                        <h6 class="text-uppercase fw-bold text-muted mb-3 small tracking-wide">
+                            <i class="bi bi-clock-history text-teal me-1" style="color: #0d9488;"></i> 2. Doctor & Timing
+                        </h6>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Doctor Selection -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Choose Doctor & Specialization</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person-badge"></i></span>
+                                    <select name="doctor" id="doctorSelect" class="form-select border-start-0" required onchange="updateFeePreview()">
+                                        <option value="" disabled selected>-- Select a Doctor --</option>
+                                        {% for doc in doctors %}
+                                            <option value="{{ doc.id }}" data-fee="{{ doc.fee }}" data-spec="{{ doc.specialization }}">
+                                                Dr. {{ doc.name }} ({{ doc.specialization }}) - ₹{{ doc.fee }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Date Picker -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Appointment Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-calendar-event"></i></span>
+                                    <input type="date" name="date" class="form-control border-start-0" min="{{ today }}" required>
+                                </div>
+                                <div class="form-text small text-muted">Past dates are automatically disabled.</div>
+                            </div>
+
+                            <!-- Time Slot Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Available Time Slot</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-alarm"></i></span>
+                                    <select name="time_slot" class="form-select border-start-0" required>
+                                        <option value="" disabled selected>-- Select Slot --</option>
+                                        {% for slot in slots %}
+                                            <option value="{{ slot.id }}">{{ slot.slot }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Consultation Fee Banner (Auto-updated via JS) -->
+                        <div id="feeBox" class="alert alert-info d-flex align-items-center justify-content-between p-3 rounded-3 mb-4" style="display: none !important;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-cash-coin fs-4 me-3 text-primary"></i>
+                                <div>
+                                    <span class="d-block small text-muted">Consultation Fee</span>
+                                    <strong class="text-dark" id="doctorSpecText">Select Doctor</strong>
+                                </div>
+                            </div>
+                            <span class="fs-4 fw-bold text-success" id="feeAmount">₹0.00</span>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex flex-column flex-sm-row gap-3 pt-2">
+                            <button type="submit" class="btn btn-lg flex-grow-1 fw-bold text-white shadow-sm" style="background-color: #0d9488;">
+                                <i class="bi bi-check2-circle me-1"></i> Confirm Booking
+                            </button>
+                            <a href="{% url 'landing' %}" class="btn btn-lg btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to Show Live Fee Preview -->
+<script>
+function updateFeePreview() {
+    const select = document.getElementById('doctorSelect');
+    const selectedOption = select.options[select.selectedIndex];
+    const feeBox = document.getElementById('feeBox');
+    const feeAmount = document.getElementById('feeAmount');
+    const specText = document.getElementById('doctorSpecText');
+
+    if (selectedOption && selectedOption.dataset.fee) {
+        feeBox.style.setProperty('display', 'flex', 'important');
+        feeAmount.innerText = '₹' + selectedOption.dataset.fee;
+        specText.innerText = selectedOption.dataset.spec;
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}DocCare - Find Doctors & Book Appointments{% endblock %}
+
+{% block content %}
+<!-- Custom Inline Styles for Extra Polish -->
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(13, 148, 136, 0.95), rgba(2, 132, 199, 0.9)), 
+                    url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        color: white;
+        padding: 80px 0 60px 0;
+        border-radius: 0 0 35px 35px;
+    }
+    .stat-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 15px 25px;
+    }
+    .doctor-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        border: none;
+        border-radius: 18px;
+    }
+    .doctor-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1) !important;
+    }
+    .specialization-badge {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        font-weight: 600;
+        border-radius: 30px;
+        padding: 5px 12px;
+    }
+</style>
+
+<!-- 1. HERO SECTION -->
+<section class="hero-section text-center text-md-start shadow-sm mb-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="badge bg-light text-dark fw-semibold px-3 py-2 rounded-pill mb-3">
+                    <i class="bi bi-shield-check text-success me-1"></i> Verified Healthcare Network
+                </span>
+                <h1 class="display-4 fw-bold lh-sm mb-3">
+                    Your Health, Our Priority. <br class="d-none d-lg-block">
+                    <span style="color: #a5f3fc;">Book Slots in Seconds.</span>
+                </h1>
+                <p class="lead mb-4 text-light opacity-90">
+                    Skip the waiting room. Connect with certified specialist doctors, schedule hassle-free appointments, and manage your health seamlessly.
+                </p>
+                
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    <a href="{% url 'book_appointment' %}" class="btn btn-light btn-lg fw-bold text-teal px-4 shadow-sm" style="color: #0d9488;">
+                        <i class="bi bi-calendar-check me-2"></i>Book Appointment
+                    </a>
+                    <a href="{% url 'show_all' %}" class="btn btn-outline-light btn-lg fw-semibold px-4">
+                        <i class="bi bi-speedometer2 me-2"></i>Reception Dashboard
+                    </a>
+                </div>
+
+                <!-- Stats Badges -->
+                <div class="d-flex gap-3 mt-4 pt-2">
+                    <div class="stat-card">
+                        <h4 class="fw-bold mb-0">{{ total_doctors }}+</h4>
+                        <small class="text-light">Specialists</small>
+                    </div>
+                    <div class="stat-card">
+                        <h4 class="fw-bold mb-0">{{ total_appointments }}+</h4>
+                        <small class="text-light">Bookings Served</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Illustration Card -->
+            <div class="col-lg-5 text-center d-none d-lg-block">
+                <div class="p-4 bg-white rounded-4 shadow-lg text-dark mx-auto" style="max-width: 380px;">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-heart-pulse-fill fs-1" style="color: #0d9488;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">Instant Doctor Booking</h5>
+                    <p class="text-muted small">Choose date, select convenient slot, and get instant booking ID.</p>
+                    <a href="{% url 'book_appointment' %}" class="btn btn-sm w-100 fw-bold" style="background-color: #0d9488; color: white;">
+                        Get Started Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container my-5">
+
+    <!-- 2. WHY CHOOSE DOC-CARE (FEATURES) -->
+    <div class="row g-4 text-center mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 p-3 border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <div class="text-teal fs-1 mb-2" style="color: #0d9488;"><i class="bi bi-clock-history"></i></div>
+                    <h5 class="fw-bold">Zero Waiting Time</h5>
+                    <p class="text-muted small mb-0">Pre-booked time slots ensure you never have to stand in long hospital queues.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-3 border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <div class="text-teal fs-1 mb-2" style="color: #0284c7;"><i class="bi bi-shield-lock"></i></div>
+                    <h5 class="fw-bold">Unique Tracking ID</h5>
+                    <p class="text-muted small mb-0">Every booking generates an unguessable booking slip reference for security.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-3 border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <div class="text-teal fs-1 mb-2" style="color: #10b981;"><i class="bi bi-arrow-repeat"></i></div>
+                    <h5 class="fw-bold">Easy Cancellation</h5>
+                    <p class="text-muted small mb-0">Plans changed? Cancel appointments with 1-click while maintaining an audit trail.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. AVAILABLE SPECIALIST DOCTORS SECTION -->
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill small">Meet Our Team</span>
+            <h2 class="fw-bold mt-2 mb-0">Available Doctors</h2>
+        </div>
+        <a href="{% url 'book_appointment' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+            Book With Them <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for doc in doctors %}
+        <div class="col-sm-6 col-lg-3">
+            <div class="card h-100 doctor-card shadow-sm border-0">
+                <div class="card-body text-center p-4">
+                    <!-- Avatar Placeholder -->
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" 
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, #ccfbf1, #e0f2fe); color: #0f766e;">
+                        <i class="bi bi-person-fill fs-1"></i>
+                    </div>
+
+                    <h5 class="fw-bold mb-1">Dr. {{ doc.name }}</h5>
+                    <span class="specialization-badge d-inline-block small mb-3">
+                        {{ doc.specialization }}
+                    </span>
+
+                    <hr class="my-2 opacity-25">
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-start">
+                            <span class="text-muted small d-block">Consultation</span>
+                            <span class="fw-bold text-dark fs-5">₹{{ doc.fee }}</span>
+                        </div>
+                        <a href="{% url 'book_appointment' %}" class="btn btn-sm px-3 rounded-pill fw-semibold" 
+                           style="background-color: #0d9488; color: white;">
+                            Book <i class="bi bi-chevron-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">Abhi koi doctor registered nahi hai. Command run karein ya add karein.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Appointment - DocCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <!-- Confirmation Card -->
+            <div class="card border-0 shadow rounded-4 overflow-hidden">
+                
+                <!-- Red Alert Header -->
+                <div class="p-4 bg-danger text-white text-center">
+                    <div class="rounded-circle bg-white text-danger d-inline-flex p-3 mb-2 shadow-sm">
+                        <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Confirm Cancellation</h4>
+                    <p class="text-white-50 small mb-0">Are you sure you want to cancel this appointment?</p>
+                </div>
+
+                <!-- Appointment Summary Details -->
+                <div class="card-body p-4">
+                    <div class="p-3 rounded-3 bg-light border mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <span class="text-muted small">Booking Reference:</span>
+                            <span class="badge bg-dark font-monospace">{{ appoinment.booking_id }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Patient Name:</span>
+                            <strong class="text-dark">{{ appoinment.patient_name }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Doctor:</span>
+                            <span class="text-dark fw-semibold">Dr. {{ appoinment.doctor.name }} ({{ appoinment.doctor.specialization }})</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">Schedule:</span>
+                            <span class="text-primary fw-semibold">
+                                <i class="bi bi-calendar-event me-1"></i>{{ appoinment.appointment_date }} ({{ appoinment.time_slot.slot }})
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Cancellation Form -->
+                    <form method="POST" action="">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary small">
+                                <i class="bi bi-pencil-square me-1 text-danger"></i>Reason for Cancellation <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="reason" rows="3" class="form-control" 
+                                      placeholder="e.g. Patient emergency, Doctor unavailable, Schedule clash..." required></textarea>
+                            <div class="form-text small text-muted">This reason will be recorded for audit and clinic records.</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex flex-column flex-sm-row gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg flex-grow-1 fw-bold shadow-sm">
+                                <i class="bi bi-x-circle me-1"></i> Confirm Cancel
+                            </button>
+                            <a href="{% url 'show_all' %}" class="btn btn-outline-secondary btn-lg px-4">
+                                Keep Booking
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
